@@ -85,6 +85,12 @@ closures etc. etc.
 
 # Really different stuff
 
+## There are no undefined variables
+
+Using a variable which has not been previously defined *never* throws an
+error. Basically, an undefined variable simply has the value of `nil`. In
+some situations, this may result in very exciting bug hunts. There are a
+
 ## Everything is passed by reference
 
 R has this neat feature that when you pass an object – whatever it is – to
@@ -116,19 +122,6 @@ a.
 
 Don't let me start on iterators.
 
-
-## Interface sucks
-
-In R, we are used to work interactively. Personally, I consider interactive
-work important when learning a language in almost any language. When
-learning lua, I use interactive shell a lot.
-
-Interactive shell of lua is a sad, sad thing. No tab completion, no `?` or
-`??`. I think the idea is that you learn lua core by heart and google the
-rest. This makes learning a process of switching between a browser and
-terminal / editor.
-
-Of course, you can use VS Code and have all the goodies.
 
 ## There is no vectorization (by default)
 
@@ -238,6 +231,20 @@ three arguments stored in an array, then you can simply do as follows
     ff(table.unpack(args))
 
 # Ugly, ugly stuff
+
+## Interface sucks
+
+In R, we are used to work interactively. Personally, I consider interactive
+work important when learning a language in almost any language. When
+learning lua, I use interactive shell a lot.
+
+Interactive shell of lua is a sad, sad thing. No tab completion, no `?` or
+`??`. I think the idea is that you learn lua core by heart and google the
+rest. This makes learning a process of switching between a browser and
+terminal / editor.
+
+Of course, you can use VS Code and have all the goodies.
+
 
 ## Package management
 
@@ -393,7 +400,7 @@ Looks almost like a real function call, doesn't it? :-)
 
 # Typical errors
 
-    attempt to perform arithmetic on a table value                                                                                                                                       
+    attempt to perform arithmetic on a table value
 
 Usually means you forgot you are in lua and did `a <- 1`.
 
@@ -405,4 +412,6 @@ Probably wrote `for k, v in tab do` instead of `for k, v in pairs(tab) do`.
 
 You did `tab.val` but tab is `nil`.
 
+    attempt to concatenate a nil value (global 'val')
 
+You tried `print("val:" .. val)` and `val` is `nil`.
