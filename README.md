@@ -1,3 +1,8 @@
+# About this document
+
+I wrote it mostly as a reminder to myself, should I ever feel the need to
+code something in lua.
+
 # Where to start
 
 You don't need much.
