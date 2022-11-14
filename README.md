@@ -327,15 +327,15 @@ Here are traps, too. First, putting a parentheses around a function call
 which returns multiple values results in one value only. These two
 print statements are different:
 
-  function foo() return 1, 2 end
-
-  print(foo())
-  print((foo()))
+    function foo() return 1, 2 end
+   
+    print(foo())
+    print((foo()))
 
 Same goes for putting parentheses around the return statement. The foo1
 returns only one value despite looking similar to foo:
 
-  function foo1() return(1, 2) end
+    function foo1() return(1, 2) end
 
 ## metatables
 
