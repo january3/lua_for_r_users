@@ -316,10 +316,10 @@ of a table, in unspecified order. The `ipairs` iterator starts with index 1
 (numerical) and increases it by one until it finds the first nil element.
 The following prints only two values:
 
-  a = { 1, 2, nil, 4 }
-  for k, v in ipairs(a) do
-    print(v)
-  end
+    a = { 1, 2, nil, 4 }
+    for k, v in ipairs(a) do
+      print(v)
+    end
 
 ## About these multiple return values...
 
