@@ -367,6 +367,53 @@ Alternatively, `__index` can be an array with default values:
     t1.__index = { a = "default" }
     t2["a"]   --> returns default
 
+This is useful for OO programming. Basically, you define a class prototype
+in a file somewhere:
+
+    local proto = { }
+
+    function proto:printval()
+      print(self.val)
+    end
+
+    function proto:new()
+      ret = { val = 42 }
+
+      return(ret)
+    end
+
+    return(proto)
+
+OK, how do we make the return value (new object) from `proto:new()` (the
+constructor) inherit the method proto:printval()?
+
+ * We set the metatable of the return object to `proto`
+ * we set the `__index` element of the `proto` table to itself
+
+    function proto:new()
+      ret = { val = 0 }
+      setmetatable(ret, self)
+      self.__index = self
+
+      return(ret)
+    end
+
+
+
+
+Now let's create a new object and call the `printval` method:
+
+    x = proto:new()
+    x:printval()
+
+What happens? lua tries to find a `printval` index in the x table. It does
+not find it, so it checks the metatable and finds that `__index` contains,
+indeed, a keyword `printval` and its value is a function - because
+`proto.__index` is the same as `proto` and we defined `proto.printval`.
+
+Nb we defined the function using a colon `proto:printval()` rather than
+`proto.printval(self)`. This is just syntactic sugar, and these two mean
+the same.
 
 ## Named parameters: function{a = 1} .... excuse me, WHAT?
 
