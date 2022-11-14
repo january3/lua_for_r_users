@@ -301,9 +301,9 @@ indices which are strings. Of course, that means that in the same array you
 can have an index which is 2 (the number) and another one which is "2" (a
 string).
 
-   a = { }
-   a["2"] = 10
-   a[2] = 20
+    a = { }
+    a["2"] = 10
+    a[2] = 20
 
 Oh, this may be so much fun.
 
