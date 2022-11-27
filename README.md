@@ -343,29 +343,54 @@ indices, but you can also add string indices. You can mix them. You can
 have non-contiguous tables with numerical indices. It is all valid.
 
 Similar like it is with lists in R, assigning the nil value (similar to
-NULL in R) to a table element removes it.
+NULL in R) to a table element removes it. Unlike in R, this does not shift
+any indices. Consider this in R:
+
+```
+a <- list(1, 2, 3)
+a[[2]] <- NULL
+a[[2]] # prints `3`
+```
+
+In lua:
+
+```
+a = { 1, 2, 3 }
+a[2] <- nil
+print(a[2]) -- prints `nil`
+```
 
 Tables are full of traps for the R user.
 
 ### Trap number one: table length
 
-If you prepend a hash to a table, you will get the number of elements in a
+If you prepend a hash to a table (`a = { 1, 2, 3 }; print(#a)`), you will get the number of elements in a
 table... provided the table has a numerical index. For
-example, the following code will return `4`, and not `5` as might be
+example, the following code will print `4`, and not `5` as might be
 expected:
 
     a = { 10, 20, 30, 40 }
     a["foo"] = 50
-    #a
+    print(#a)
 
-So you have to somehow make sure that you use `#a` only when a has a
-numerical index (or, in lua-speak, is an array).
+Worse. If you mix numeric and string indices and use `#` or `table.getn`,
+anything can happen, because the results of the `#` operator are 
+[undefined](http://www.lua.org/manual/5.2/manual.html#3.4.6) 
+*unless* the table only has numeric keys equal to 1, 2, ... n for some n. 
+This is what some refer to as "array" in lua.
+*You* have to somehow make sure that you use `#a` only in such cases.
 
 The easiest way to ensure this is to exclusively use the `table` standard
 library to manipulate tables which should work as "arrays" (and "array" is
 what we call a "vector" in R). Use `table.insert` to insert an element,
 `table.remove` to remove an element, `table.getn` to get the length of an
 array and `table.setn` to set the length of an array.
+
+And how do you count the elements of a table which is not an array? No built-in
+solution, but you can always do 
+`i = 0;for _, _ in pairs(t) do i = i + 1 ; end`. 
+Not that it matters much – basically, if you need it, you probably
+are doing something wrong.
 
 ### Trap number two: string indices
 
