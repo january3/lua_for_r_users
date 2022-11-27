@@ -1,9 +1,62 @@
-# About this document
+# First things first
+
+## About this document
 
 I wrote it mostly as a reminder to myself, should I ever feel the need to
 code something in lua.
 
-# Where to start
+## Why use lua
+
+The main reason to use lua is it's speed, and also it's speed. The *two*
+main reasons to use lua are speed, and speed, and moreover speed. The
+*three* main reasons...
+
+Consider a simple grep on the list of packages installed on my system:
+
+```
+-- grep in lua, file grep.lua      # grep in python, file grep.py            # bash
+                                                                             grep lua package_list
+for line in io.lines(arg[1]) do    import re
+  if line:find(arg[2]) then        import sys
+    print(line)                    
+  end                              file_one = open(sys.argv[1], "r")
+end                                for word in file_one:
+                                       if re.search(sys.argv[2], word):
+                                           print(word)
+                                   file_one.close()
+-- time: 0.015s                    # time: 0.059s                            # time: 0.07s
+```
+
+Python is an order of magnitude slower than the pure C grep program. Lua is
+merely twice as slow. That makes lua really useful to implement filters, ad
+hoc scripts invoked many times and similar. This is not only due to the
+fact that lua has a smaller footprint and is super fast to load, but also
+because it actually is faster.
+
+The other reason is the simplicity with which lua integrates with C, both
+ways. Both ways? I mean that it is easy to use C/C++ libraries in lua
+programs, but also the other way round: to use lua from within C programs.
+
+## Why not use lua
+
+Lua aims for a small footprint and it pays a price for that. What good is a
+scripting language if you have to implement every damn thing yourself?
+Sure, there are plenty of libraries around, but installing them (e.g. with
+luarocks) is a bother. Lua distro comes with the bare minimum. So if you
+want to implement grep, you are fine, but why would you want to do that.
+For anything more complex, use Python or R.
+
+Or at least that is the impression one might have. My own personal opinion
+is: I still use awk, sed and program in bash. Using awk is, excuse the pun,
+awkward. Programing in bash is as much fun as hitting your fingers with a
+sledgehammer, only less colorful.  Lua snuggly fits a gap between very
+basic things and the actually complex stuff for which you want to develop
+serious code. Learning lua takes a weekend, and it is good to have this
+little utility in your pocket. It has the simplicity I miss from my early
+Perl programming days, where I would use Perl to write little filters doing
+simple jobs.
+
+## Where to start
 
 You don't need much.
 
@@ -11,7 +64,7 @@ You don't need much.
  * [Programming in lua](https://www.lua.org/pil/contents.html) if you are
    feeling fancy
  * [lua reference manual](https://www.lua.org/manual/) if you are a
-   software engineer or some other kind of deviant
+   software engineer or some other kind of extraterrestrial
 
 # Similar stuff
 
@@ -22,6 +75,10 @@ Loads of stuff is really the same.
  * The `.` in R is just another variable
     name, and so is `_` in lua.
  * `dofile` is basically the same as `source`.
+ * `require` stands for `library`
+ * In R, you may omit the quotes simetimes (think `library(tidyverse)`). In
+   lua, you can omit parentheses in a function call if the value is a
+   string (i.e., you can do `require "lfs"`).
  * Instead of curly braces, you have use keywords: `function ... end`,
     `do ... end`, `if ... then ... elseif ... else ... end`.
  * You define tables
@@ -29,8 +86,8 @@ Loads of stuff is really the same.
     square brackets, and square brackets are used for indices.
  * Indices of tables start, by default, at 1.
  * comments start with `--`, and not `#`. There are also multiline comments
-   which start with `--[[` and end with `--]]`
- * you can put everything on one line, no semicolons necessary. `a = 1 b = 2` is perfectly fine.
+   which start with `--[[` and end with `--]]` (I miss that in R!)
+ * you can put everything on one line, no semicolons necessary. `a = 1 b = 2` is perfectly fine. Of course, don't do that.
  * `return` must be the last statement in a block (so last before `end`,
    `else`, `elseif`)
 
@@ -63,12 +120,13 @@ And we can pass the unspecified number of arguments to the next function
 like this:
 
   function foo2(...)
-    foo(table.unpack({...}))
+    foo(...)
   end
 
 However, one big caveat: the above syntax changed between versions of lua.
 Not sure exactly when. Basically, in older lua you use `arg` instead of
-`{...}` and `unpack` instead of `table.unpack`.
+`{...}` and you need it to unpack it before passing to the function (as in
+`foo(unpack(arg))`. BTW, `unpack` is now `table.unpack`). 
 
 
 ## Functions are values
@@ -89,7 +147,7 @@ closures etc. etc.
 
 Using a variable which has not been previously defined *never* throws an
 error. Basically, an undefined variable simply has the value of `nil`. In
-some situations, this may result in very exciting bug hunts. There are a
+some situations, this may result in very exciting bug hunts.
 
 ## Everything is passed by reference
 
@@ -118,10 +176,18 @@ then the array will stay modified. Consider this piece of lua code:
 produces 0, and not 2. That means, function ff modified the original array
 a.
 
+## No vectors, and strings are objects
+
+In R, basically everything is either a vector or a list or a function. In
+lua, everything is either a scalar or a table or a function (remarkably,
+almost everything in these two sententces is wrong, but it is a good
+approximation). And strings are objects inheriting from the class `string`,
+so if you have a function like `string.find(str, pattern)` you can simply
+write `str:find(pattern)`. Neat.
+
 ## Iterators
 
 Don't let me start on iterators.
-
 
 ## There is no vectorization (by default)
 
@@ -139,7 +205,6 @@ lapply is actually trivial
     end
 
     foo = lapply({ 1, 2, 3, 4 }, function(x) return x/2 end)
-
 
 There are several libraries out there that can give you more of
 vectorizations, including the ability to simply divide an array by a number.
@@ -260,11 +325,12 @@ it comes to documentation, again, everybody seems to be on their own: no
 standards, no templates, no consistency. When poeple criticize lua for
 using `1` as starting index of an array, they have no clue; however, module
 management under lua is for me one of the top reasons not to use lua. Perl
-had a better package management twenty years ago.
+had a better package management twenty years ago. R about two hundred years
+ago. 
 
 # Really weird stuff that takes getting used to
 
-## Tables
+## Tables vs arrays
 
 The good news is, after a while you not only get used to tables in lua, but actually
 start liking it. The bad news is, it may be a minefield, especially at the
@@ -327,6 +393,18 @@ The following prints only two values:
     for k, v in ipairs(a) do
       print(v)
     end
+
+Above code prints only `1 2`.
+
+### Bottom line: tables are not always tables
+
+The above traps result from the fact that tables in lua moonshine as
+arrays. Arrays are congruent (i.e., without `nil`s) tables with only
+numerical indices starting at one. So `{"a", "b", "c"}` is an array, and
+`{a=1, b=2, c=3}` is a table. When programming, you need to mentally
+separate the two. Make sure you always know if a table works as an array,
+and only use `table.insert` and `table.remove` to insert and remove
+elements, also use `ipairs` and not `pairs` to iterate. 
 
 ## About these multiple return values...
 
@@ -429,8 +507,8 @@ footwork:
 
     function stranger(t)
 
-      a = t[1] or t.a or error("a is required")
-      b = t[2] or t.b or "default"
+      a = t.a or t[1] or error("a is required")
+      b = t.b or t[2] or "default"
       print(a, b)
 
     end
@@ -444,6 +522,58 @@ syntactic sugar on top of it and you can omit the parentheses:
     stranger{b=2, a=1}
 
 Looks almost like a real function call, doesn't it? :-)
+
+# Dumb stuff people say about lua
+
+A lot of lua critisism is justified. However, some arguments miss the point.
+
+## Lua indices start at 1
+
+For an R user it is of course not an issue. However, there's more to it.
+Basically, you *can* have an array with an index 0, but it will cause a
+headache. (I have seen a funny comment to a guy who posted a list of
+complaints about lua, the first one being that index in lua starts at 1.
+The comment: "shouldn't you start your list at index 0? ;)")
+
+## Lue does not have a continue statement
+
+There is no statement that allows to skip the rest of a loop in lua. Oh
+wait, yes, there is. 
+Basically, you [*can* have a *goto* statement in lua](http://lua-users.org/wiki/GotoStatement) if
+you really want, but why would you want to do that?
+
+I always considered `continue` (as well as `break`) to be something of a goto statement, and
+avoided it in my code unless it made things really simple and transparent,
+because for me, it usually makes it harder to see exactly what is
+happening. I usually prefer some other solution; I think that even using an
+`if...else...` clause is in most cases better. So even though sometimes
+`continue` might come in handy, I don't think it is a major thing to miss.
+
+## No `i++` or `+=` syntactic sugar
+
+Are you shitting me.
+
+## String concatenation is `..` and not `+`
+
+See above. Also, it is possible to overload `+` in lua (by changing the
+metatable entry `__add` of an object).
+
+## Lua doesn't have Unicode support
+
+Not precisely true. First of all, lua's strings are little weirdos. In lua
+a string is just a sequence of bytes, so it is not `\0` terminated and
+therefore can contain or represent any data. Including Unicode strings.
+However, what about changing a string to uppercase, searching, replacing
+etc.? Well, you need to use [a library](https://github.com/starwing/luautf8) for that. 
+
+Also, anyone who doesn't know 
+[how much pain](https://kevinushey.github.io/blog/2018/02/21/string-encoding-and-r/) 
+it can be with Unicode in R should shut up about Unicode support in lua.
+
+## There are no bitwise operators or integers
+
+Well, [there are now](https://www.lua.org/manual/5.3/manual.html#3.4.2).
+
 
 # Typical errors
 
@@ -461,4 +591,5 @@ You did `tab.val` but tab is `nil`.
 
     attempt to concatenate a nil value (global 'val')
 
-You tried `print("val:" .. val)` and `val` is `nil`.
+You tried `print("val:" .. val)` and `val` is `nil`. Either `print("val:",
+val)` or `print("val:"..tostring(val))`.
