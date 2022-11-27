@@ -31,7 +31,8 @@ Python is an order of magnitude slower than the pure C grep program. Lua is
 merely twice as slow. That makes lua really useful to implement filters, ad
 hoc scripts invoked many times and similar. This is not only due to the
 fact that lua has a smaller footprint and is super fast to load, but also
-because it actually is faster.
+because it actually is faster (at least for some 
+[mundane stuff](https://benchmarksgame-team.pages.debian.net/benchmarksgame/fastest/lua-python3.html)).
 
 The other reason is the simplicity with which lua integrates with C, both
 ways. Both ways? I mean that it is easy to use C/C++ libraries in lua
@@ -263,12 +264,12 @@ Moreover, logical operators return the last value evaluated, and not `true`
 or `false`. That is, the value of `false or "foo"` is `"foo"`. This makes
 it very practical, for example to set a default value:
 
-  a = arg1 or arg2 or "default"
+    a = arg1 or arg2 or "default"
 
 There is also an idiom that corresponds to the `a ? b : c` idiom of some
 other languages:
 
-  max = a < max and max or a
+    max = a < max and max or a
 
 This is a bit harder to understand, but it works like this: if a is smaller
 than max, then `a < max and max` is true, and its value is `max`. Lua no
